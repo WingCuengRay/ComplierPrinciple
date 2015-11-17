@@ -1,0 +1,11 @@
+var i,sum;
+begin
+sum:=0;
+read(i);
+while i!=0 do
+	begin
+		sum:=sum+i;
+		i:=i-1;
+	end;
+write(sum);
+end.
