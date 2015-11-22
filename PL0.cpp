@@ -339,6 +339,17 @@ int getsym()
 					sym=nul;            /*不能识别的符号*/
 				}
 			}
+			else if(ch == '*')
+			{
+				getchdo;
+				if (ch == '=')
+				{
+					sym = timesAssign;
+					getchdo;
+				}
+				else
+					sym = nul;
+			}
 			else
 			{
 				if(ch=='<')         /*检测小于或小于等于符号*/
@@ -745,19 +756,30 @@ int statement(bool* fsys,int * ptx,int lev)
    	 		else
    	 		{
    	 			getsymdo;				//获取下一个符号，并判断其类型
+				bool isTimesAssign = false;
    	 			if(sym==becomes)
    	 			{
    	 				getsymdo;
-   	 			}
+   	 			} 
+				else if (sym == timesAssign)
+				{
+					getsymdo;
+					isTimesAssign = true;
+				}
    	 			else
    	 			{
    	 			 	error(13);
    	 			}
-   	 			memcpy(nxtlev,fsys,sizeof(bool)* symnum);
+   	 			memcpy(nxtlev,fsys,sizeof(bool)* symnum);			//这两句的意思？
    	 			expressiondo(nxtlev,ptx,lev);
    	 			if(i!=0)
    	 			{
-   	 			 	gendo(sto,lev-table[i].level,table[i].adr);
+					if(isTimesAssign)// '*=' 赋值
+					{
+						gendo(lod, lev - table[i].level, table[i].adr);
+						gendo(opr, 0, 4);
+					}
+					gendo(sto, lev - table[i].level, table[i].adr);	
    	 			}
    	 	    }
    		}

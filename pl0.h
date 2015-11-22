@@ -8,17 +8,17 @@
 # define levmax 3                /*最大允许过程嵌套声明层数[0，lexmax]*/
 # define cxmax 200               /*最多的虚拟机代码数*/
 /*符号*/
-enum symbol{
-	nul,    ident,		number,		plus,		minus,
-	times,  slash,		oddsym,		eql,		neq,
-	lss,	leq,		gtr,		geq,		lparen,
-	rparen,	comma,		semicolon,	period,		becomes,
-	beginsym,	endsym,		ifsym,		thensym,	whilesym,
-	writesym,	readsym,	dosym,		callsym,	constsym,
-	varsym,		procsym,	elsesym,	forsym,		stepsym,
-	untilsym,	returnsym
+enum symbol {
+	nul, ident, number, plus, minus,
+	times, slash, oddsym, eql, neq,
+	lss, leq, gtr, geq, lparen,
+	rparen, comma, semicolon, period, becomes,
+	beginsym, endsym, ifsym, thensym, whilesym,
+	writesym, readsym, dosym, callsym, constsym,
+	varsym, procsym, elsesym, forsym, stepsym,
+	untilsym, returnsym, timesAssign
 };
-#define symnum 37
+#define symnum 38
 /*-------------*/
 enum object{
    constant,

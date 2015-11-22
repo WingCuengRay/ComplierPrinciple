@@ -1,11 +1,11 @@
 var i,sum;
 begin
-sum:=0;
+sum:=1;
 read(i);
 while i!=0 do
 	begin
-		sum:=sum+i;
+		sum*=i;
 		i:=i-1;
 	end;
 write(sum);
-end.
+end.		
