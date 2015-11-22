@@ -9,15 +9,16 @@
 # define cxmax 200               /*最多的虚拟机代码数*/
 /*符号*/
 enum symbol{
-	 nul,    ident,     number,     plus,     minus,
-	 times,   slash,   oddsym,   eql,     neq,
-lss,     leq,      gtr,     geq,     lparen,
-rparen,  comma,   semicolon,period,  becomes,
-beginsym, endsym, ifsym,    thensym,  whilesym,
-writesym, readsym,  dosym,  callsym,  constsym,
-varsym,  procsym,
+	nul,    ident,		number,		plus,		minus,
+	times,  slash,		oddsym,		eql,		neq,
+	lss,	leq,		gtr,		geq,		lparen,
+	rparen,	comma,		semicolon,	period,		becomes,
+	beginsym,	endsym,		ifsym,		thensym,	whilesym,
+	writesym,	readsym,	dosym,		callsym,	constsym,
+	varsym,		procsym,	elsesym,	forsym,		stepsym,
+	untilsym,	returnsym
 };
-#define symnum 32
+#define symnum 37
 /*-------------*/
 enum object{
    constant,
@@ -49,7 +50,7 @@ enum symbol sym;
 char id[al+1];
 int  num;
 int cc,ll;
-int cx;
+int cx;			//cx是保存当前指令地址的全局变量
 char line[81];
 char a[al+1];
 struct instruction code[cxmax];
@@ -57,9 +58,9 @@ char word[norw][al];
 enum symbol wsym[norw];
 enum symbol ssym[256];
 char mnemonic[fctnum][5];
-bool declbegsys[symnum];
-bool statbegsys[symnum];
-bool facbegsys[symnum];
+bool declbegsys[symnum];		//声明开始符号集
+bool statbegsys[symnum];		//表达式开始符号集
+bool facbegsys[symnum];			//项开始符号集
 /*------------------------------*/
 
 

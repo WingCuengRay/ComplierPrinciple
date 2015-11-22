@@ -646,7 +646,7 @@ void enter (enum object k,int *ptx,int lev, int *pdx)
 int position(char *  idt,int  tx)
 {
 	int i;
-	strcpy(table[0].name,idt);
+	strcpy(table[0].name,idt);		//作哨兵处理。保证肯定会有i=0匹配单词
 	i=tx;
 	while(strcmp(table[i].name,idt)!=0)
 	{
@@ -730,7 +730,7 @@ int statement(bool* fsys,int * ptx,int lev)
    	bool nxtlev[symnum];
    	if(sym==ident)
    	{
-		i=position(id,*ptx);
+		i=position(id,*ptx);			//见285行，id在getsym()中被置为当前单词
    	 	if(i==0)
    	 	{
    	 		error(11);
@@ -744,7 +744,7 @@ int statement(bool* fsys,int * ptx,int lev)
    	 		}
    	 		else
    	 		{
-   	 			getsymdo;				//获取一个符号，并判断其类型
+   	 			getsymdo;				//获取下一个符号，并判断其类型
    	 			if(sym==becomes)
    	 			{
    	 				getsymdo;
@@ -881,7 +881,7 @@ int statement(bool* fsys,int * ptx,int lev)
 						{
 							error(16);          /*缺少then*/
 						}
-						cx1=cx;                /*保存当前指令地址*/
+						cx1=cx;                /*保存当前指令地址*/	
 						gendo(jpc,0,0);        /*生成条件跳转指令，跳转地址暂写0*/
 						statementdo(fsys,ptx,lev);   /*处理then后的语句*/
 						code[cx1].a=cx;      /*经statement处理后，cx为then后语句执行
@@ -1010,7 +1010,7 @@ int term(bool*fsys,int *ptx,int lev)
     memcpy(nxtlev,fsys,sizeof(bool)*symnum) ;
     nxtlev[times]=true;
     nxtlev[slash]=true;
-    factordo(nxtlev,ptx,lev);       /*处理因子*/
+    factordo(nxtlev,ptx,lev);		/*处理因子*/
     while(sym==times||sym==slash)
     {
 		mulop=sym;
@@ -1102,7 +1102,7 @@ int condition(bool* fsys,int* ptx,int lev)
 {
     enum symbol relop;
     bool nxtlev[symnum];
-    if(sym==oddsym)                        /*准备按照odd运算处理*/
+    if(sym==oddsym)                        /*准备按照odd运算处理*/		//odd运算就是奇偶判断
    	{
 		getsymdo;
 		expressiondo(fsys,ptx,lev);
