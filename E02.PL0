@@ -1,10 +1,10 @@
 var i,sum;
 begin
-sum:=1;
+sum:=100;
 read(i);
-while i!=0 do
+while i<>0 do
 	begin
-		sum*=i;
+		sum-=i;
 		i:=i-1;
 	end;
 write(sum);

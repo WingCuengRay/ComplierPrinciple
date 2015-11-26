@@ -122,6 +122,7 @@ void init()
 	strcpy(&(word[10][0]),"var");
 	strcpy(&(word[11][0]),"while");
 	strcpy(&(word[12][0]),"write");
+	strcpy(&(word[13][0]), "else");
 	/*设置保留字符号*/
 	wsym[0]=beginsym;
 	wsym[1]=callsym;
@@ -136,6 +137,7 @@ void init()
 	wsym[10]=varsym;
 	wsym[11]=whilesym;
 	wsym[12]=writesym;
+	wsym[13]= elsesym;
 
 	/*设置指令名称*/
 	strcpy(&(mnemonic[lit][0]),"lit");
@@ -339,7 +341,34 @@ int getsym()
 					sym=nul;            /*不能识别的符号*/
 				}
 			}
-			else if(ch == '*')
+			else if(ch == '+')			// '+='
+			{
+				getchdo;
+				if (ch == '=')
+				{
+					sym = plusAssign;
+					getchdo;
+				}
+				else if (ch == '+')
+				{
+					sym = plusplus;
+					getchdo;
+				}
+				else
+					sym = plus;
+			}
+			else if (ch == '-')			// '-='	
+			{
+				getchdo;
+				if (ch == '=')
+				{
+					sym = minusAssign;
+					getchdo;
+				}
+				else
+					sym = minus;
+			}
+			else if(ch == '*')			// '*='
 			{
 				getchdo;
 				if (ch == '=')
@@ -348,7 +377,18 @@ int getsym()
 					getchdo;
 				}
 				else
-					sym = nul;
+					sym = times;
+			}
+			else if (ch == '/')			// '/='
+			{
+				getchdo;
+				if (ch == '=')
+				{
+					sym = slashAssign;
+					getchdo;
+				}
+				else
+					sym = slash;
 			}
 			else
 			{
@@ -358,6 +398,11 @@ int getsym()
 					if(ch=='=')
 					{
 						sym=leq;
+						getchdo;
+					}
+					else if (ch == '>')
+					{
+						sym = neq;
 						getchdo;
 					}
 					else
@@ -380,15 +425,15 @@ int getsym()
 						    sym=gtr;
 						}
 					}
-					else if (ch == '!')
-					{
-						getchdo;
-						if (ch == '=')
-						{
-							sym = neq;
-							getchdo;
-						}
-					}
+					//else if (ch == '!')
+					//{
+					//	getchdo;
+					//	if (ch == '=')
+					//	{
+					//		sym = neq;
+					//		getchdo;
+					//	}
+					//}
 					else
 					{
 						sym=ssym[ch];/* 当符号不满足上述条件时，全部按照单字符号处理*/
@@ -756,15 +801,16 @@ int statement(bool* fsys,int * ptx,int lev)
    	 		else
    	 		{
    	 			getsymdo;				//获取下一个符号，并判断其类型
-				bool isTimesAssign = false;
+				enum symbol tmpsym = sym;	//保存当前的符号	
    	 			if(sym==becomes)
    	 			{
    	 				getsymdo;
    	 			} 
-				else if (sym == timesAssign)
+				else if (sym == plusAssign || sym == minusAssign || sym == timesAssign || sym == slashAssign)
 				{
 					getsymdo;
-					isTimesAssign = true;
+					//必须加在这，已确定了一个运算对象
+					gendo(lod, lev - table[i].level, table[i].adr);
 				}
    	 			else
    	 			{
@@ -774,13 +820,15 @@ int statement(bool* fsys,int * ptx,int lev)
    	 			expressiondo(nxtlev,ptx,lev);
    	 			if(i!=0)
    	 			{
-					if(isTimesAssign)// '*=' 赋值
+					// sym的值已经被改变了，所以需要用前面保存了sym的tmpsym变量
+					if (tmpsym == plusAssign || tmpsym == minusAssign || tmpsym == timesAssign || tmpsym == slashAssign)	// '*=' 赋值
 					{
-						gendo(lod, lev - table[i].level, table[i].adr);
-						gendo(opr, 0, 4);
+						//gendo(lod, lev - table[i].level, table[i].adr);
+						gendo(opr, 0, tmpsym - plusAssign+2);			// 2,3,4,5分别对应加减乘除
 					}
-					gendo(sto, lev - table[i].level, table[i].adr);	
+					gendo(sto, lev - table[i].level, table[i].adr);
    	 			}
+				tmpsym = nul;
    	 	    }
    		}
     }
@@ -908,6 +956,8 @@ int statement(bool* fsys,int * ptx,int lev)
 						statementdo(fsys,ptx,lev);   /*处理then后的语句*/
 						code[cx1].a=cx;      /*经statement处理后，cx为then后语句执行
                             完的位置，它正是前面未定的跳转地址*/
+
+						//
 					}
 					else
 					{

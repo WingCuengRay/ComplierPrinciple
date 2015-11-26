@@ -1,6 +1,6 @@
                          /*PL/0 编译系统C版本头文件 pl0.h*/
 
-# define norw 13                 /*关键字个数*/
+# define norw 14                 /*关键字个数*/
 # define txmax 100               /*名字表容量*/
 # define nmax  14                /*number的最大位数*/
 # define al 10                   /*符号的最大长度*/
@@ -16,9 +16,10 @@ enum symbol {
 	beginsym, endsym, ifsym, thensym, whilesym,
 	writesym, readsym, dosym, callsym, constsym,
 	varsym, procsym, elsesym, forsym, stepsym,
-	untilsym, returnsym, timesAssign
+	untilsym, returnsym, plusAssign, minusAssign,
+	timesAssign, slashAssign,plusplus
 };
-#define symnum 38
+#define symnum 42			//!!修改symbol枚举结构时要对应修改symnum
 /*-------------*/
 enum object{
    constant,
