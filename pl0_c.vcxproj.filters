@@ -21,6 +21,12 @@
     <None Include="test.pl0">
       <Filter>源文件</Filter>
     </None>
+    <None Include="E01.PL0">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="if.pl0">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PL0.cpp">

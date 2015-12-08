@@ -146,7 +146,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="E01.PL0" />
     <None Include="E02.PL0" />
+    <None Include="if.pl0" />
     <None Include="test.pl0" />
   </ItemGroup>
   <ItemGroup>

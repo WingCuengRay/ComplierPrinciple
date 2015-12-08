@@ -1,0 +1,17 @@
+var a,b,c;
+begin
+read(b);
+if b<>0 then
+begin
+	read(a);
+	a += 5;
+	write(a);
+	a -= 5;
+	write(a);
+	a *= 5;
+	write(a);
+	a /= 5;
+	write(a);
+end
+end.
+

@@ -1,4 +1,4 @@
-                         /*PL/0 编译系统C版本头文件 pl0.h*/
+ /*PL/0 编译系统C版本头文件 pl0.h*/
 
 # define norw 14                 /*关键字个数*/
 # define txmax 100               /*名字表容量*/

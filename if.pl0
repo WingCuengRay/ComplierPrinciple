@@ -1,0 +1,9 @@
+var i,sum;
+begin
+sum:=100;
+read(i);
+read(sum);
+if i>5 then
+	sum += 5;
+write(sum);
+end.	
