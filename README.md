@@ -7,10 +7,10 @@ PL/0 C语言实现
   - pl0.h
 
 2. pl/0 测试例程
-  - E01.PL0  用于测试 '+=' '-=' '*=' '/=' 符号
-  - E02.PL0  用于测试 '<>' 符号
-  - if.pl0   用于测试 'else' 分支
-  - test.pl0  用于测试while循环结构
+  - E01.PL0     用于测试 '+=' '-=' '*=' '/=' 符号
+  - E02.PL0     用于测试 '<>' 符号
+  - if.pl0      用于测试 'else' 分支
+  - test.pl0    用于测试while循环结构
 
 3. visual studio 2015 工程文件
   - pl0_c.vcxproj
