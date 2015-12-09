@@ -113,31 +113,32 @@ void init()
 	strcpy(&(word[1][0]),"call");
 	strcpy(&(word[2][0]),"const");
 	strcpy(&(word[3][0]),"do");
-	strcpy(&(word[4][0]),"end");
-	strcpy(&(word[5][0]),"if");
-	strcpy(&(word[6][0]),"odd");
-	strcpy(&(word[7][0]),"procedure");
-	strcpy(&(word[8][0]),"read");
-	strcpy(&(word[9][0]),"then");
-	strcpy(&(word[10][0]),"var");
-	strcpy(&(word[11][0]),"while");
-	strcpy(&(word[12][0]),"write");
-	strcpy(&(word[13][0]), "else");
+	strcpy(&(word[4][0]), "else");
+	strcpy(&(word[5][0]),"end");
+	strcpy(&(word[6][0]),"if");
+	strcpy(&(word[7][0]),"odd");
+	strcpy(&(word[8][0]),"procedure");
+	strcpy(&(word[9][0]),"read");
+	strcpy(&(word[10][0]),"then");
+	strcpy(&(word[11][0]),"var");
+	strcpy(&(word[12][0]),"while");
+	strcpy(&(word[13][0]),"write");
 	/*设置保留字符号*/
 	wsym[0]=beginsym;
 	wsym[1]=callsym;
 	wsym[2]=constsym;
 	wsym[3]=dosym;
-	wsym[4]=endsym;
-	wsym[5]=ifsym;
-	wsym[6]=oddsym;
-	wsym[7]=procsym;
-	wsym[8]=readsym;
-	wsym[9]=thensym;
-	wsym[10]=varsym;
-	wsym[11]=whilesym;
-	wsym[12]=writesym;
-	wsym[13]= elsesym;
+	wsym[4]=elsesym;
+	wsym[5]=endsym;
+	wsym[6]=ifsym;
+	wsym[7]=oddsym;
+	wsym[8]=procsym;
+	wsym[9]=readsym;
+	wsym[10]=thensym;
+	wsym[11]=varsym;
+	wsym[12]=whilesym;
+	wsym[13]=writesym;
+	
 
 	/*设置指令名称*/
 	strcpy(&(mnemonic[lit][0]),"lit");
@@ -166,10 +167,13 @@ void init()
 	statbegsys[callsym]=true;
 	statbegsys[ifsym]=true;
 	statbegsys[whilesym]=true;
+	statbegsys[readsym] = true;			//新加的开始符号集 read 和 write
+	statbegsys[writesym] = true;
 	/*设置因子开始符号集*/
 	facbegsys[ident]=true;
 	facbegsys[number]=true;
 	facbegsys[lparen]=true;
+
 }
  /*
   *用数组实现集合的集合运算
@@ -299,7 +303,8 @@ int getsym()
 			}
 
 		}while(i<=j);			//查找关键字
-		if(i-1>j)				//成立则表示找不到关键字，即该字符串不是关键字
+
+		if(i-1>j)				//成立则代表该符号是关键字
 		{
 			sym=wsym[k];
 		}
@@ -762,6 +767,7 @@ int vardeclaration(int * ptx,int lev,int * pdx)
     }
     return 0;
 }
+
  /*
   *输入目标代码清单
   */
@@ -777,8 +783,13 @@ void listcode(int cx0)
    	    }
    	 }
 }
+
+
 /*
 *语句处理
+*fsys:当前模块后跟符号集合
+*ptx:名字表当前尾指针
+*lev:当前分程序所在层
 */
 int statement(bool* fsys,int * ptx,int lev)
 {
@@ -952,12 +963,22 @@ int statement(bool* fsys,int * ptx,int lev)
 							error(16);          /*缺少then*/
 						}
 						cx1=cx;                /*保存当前指令地址*/	
-						gendo(jpc,0,0);        /*生成条件跳转指令，跳转地址暂写0*/
+						gendo(jpc,0,0);			//表达式为假的情况,要跳转去else
+												//生成条件跳转指令，跳转地址暂写0*
 						statementdo(fsys,ptx,lev);   /*处理then后的语句*/
-						code[cx1].a=cx;      /*经statement处理后，cx为then后语句执行
-                            完的位置，它正是前面未定的跳转地址*/
 
-						//
+						/* 跳转出if语句*/		
+						cx2 = cx;
+						gendo(jmp, 0, 0);				
+						code[cx1].a=cx;			//then之后的回填，若if不成立则跳转到这里的cx
+												/*经statement处理后，cx为then后语句执行完的位置，它正是前面未定的跳转地址*/
+						getsymdo;
+						if (sym == elsesym)
+						{
+							getsymdo;
+							statementdo(fsys, ptx, lev);
+						}
+						code[cx2].a = cx;	//回填地址，此地址为else语句执行完后的地址，也是整个if结束的地址
 					}
 					else
 					{
@@ -975,10 +996,10 @@ int statement(bool* fsys,int * ptx,int lev)
 								{
 									getsymdo;
 								}
-								else
-								{
-									error(10);/*缺少分号*/
-								}
+								//else
+								//{
+								//	error(10);/*缺少分号*/
+								//}
 								statementdo(nxtlev,ptx,lev);
 							}
 							if(sym==endsym)
