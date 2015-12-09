@@ -5,5 +5,7 @@ read(i);
 read(sum);
 if i>5 then
 	sum += 5;
+else
+	sum -= 5;
 write(sum);
 end.	
