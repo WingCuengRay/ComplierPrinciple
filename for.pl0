@@ -1,0 +1,11 @@
+var i,j,n;
+begin
+	n := 10;
+	j := 0;
+	for i:=1 step 1 until n do
+	begin
+		if j>0 then
+			write(j);
+		j += 1;
+	end;
+end.

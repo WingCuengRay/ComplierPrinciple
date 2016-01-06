@@ -1,6 +1,5 @@
-
-var i,sum;
 const j=10;
+var i,sum;
 begin
 sum:=100;
 read(i);

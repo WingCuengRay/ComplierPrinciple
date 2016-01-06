@@ -113,16 +113,19 @@ void init()
 	strcpy(&(word[1][0]),"call");
 	strcpy(&(word[2][0]),"const");
 	strcpy(&(word[3][0]),"do");
-	strcpy(&(word[4][0]), "else");
+	strcpy(&(word[4][0]),"else");
 	strcpy(&(word[5][0]),"end");
-	strcpy(&(word[6][0]),"if");
-	strcpy(&(word[7][0]),"odd");
-	strcpy(&(word[8][0]),"procedure");
-	strcpy(&(word[9][0]),"read");
-	strcpy(&(word[10][0]),"then");
-	strcpy(&(word[11][0]),"var");
-	strcpy(&(word[12][0]),"while");
-	strcpy(&(word[13][0]),"write");
+	strcpy(&(word[6][0]),"for");
+	strcpy(&(word[7][0]),"if");
+	strcpy(&(word[8][0]),"odd");
+	strcpy(&(word[9][0]),"procedure");
+	strcpy(&(word[10][0]),"read");
+	strcpy(&(word[11][0]),"step");
+	strcpy(&(word[12][0]),"then");
+	strcpy(&(word[13][0]),"until");
+	strcpy(&(word[14][0]),"var");
+	strcpy(&(word[15][0]),"while");
+	strcpy(&(word[16][0]),"write");
 	/*设置保留字符号*/
 	wsym[0]=beginsym;
 	wsym[1]=callsym;
@@ -130,14 +133,17 @@ void init()
 	wsym[3]=dosym;
 	wsym[4]=elsesym;
 	wsym[5]=endsym;
-	wsym[6]=ifsym;
-	wsym[7]=oddsym;
-	wsym[8]=procsym;
-	wsym[9]=readsym;
-	wsym[10]=thensym;
-	wsym[11]=varsym;
-	wsym[12]=whilesym;
-	wsym[13]=writesym;
+	wsym[6]=forsym;
+	wsym[7]=ifsym;
+	wsym[8]=oddsym;
+	wsym[9]=procsym;
+	wsym[10]=readsym;
+	wsym[11]=stepsym;
+	wsym[12]=thensym;
+	wsym[13]=untilsym;
+	wsym[14]=varsym;
+	wsym[15]=whilesym;
+	wsym[16]=writesym;
 	
 
 	/*设置指令名称*/
@@ -170,11 +176,13 @@ void init()
 	statbegsys[readsym] = true;			//新加的开始符号集 read 和 write
 	statbegsys[writesym] = true;
 	statbegsys[ident] = true;
+	statbegsys[forsym] = true;
 	/*设置因子开始符号集*/
 	facbegsys[ident]=true;
 	facbegsys[number]=true;
 	facbegsys[lparen]=true;
 }
+
  /*
   *用数组实现集合的集合运算
   */
@@ -941,8 +949,8 @@ int statement(bool* fsys,int * ptx,int lev)
 							if(table[i].kind==procedur)
 							{
 								gendo(cal,lev-table[i].level,table[i].adr);  /*生成call指令*/
-							}
-							else
+}
+														else
 							{
 								error(15);      /*call后标识符应为过程*/
 							}
@@ -1041,8 +1049,78 @@ int statement(bool* fsys,int * ptx,int lev)
 							}
 							else
 							{
-								memset(nxtlev,0,sizeof(bool)*symnum);/*语句结束无补救集合*/
-								testdo(fsys,nxtlev,19);/*检测语句结束的正确性*/
+								if (sym == forsym)
+								{
+									getsymdo;
+									if (sym == ident)
+									{
+										i = position(id, *ptx);
+										if (i == 0)
+										{
+											error(11);
+										}
+										else
+										{
+											memcpy(nxtlev, fsys, sizeof(bool)*symnum);
+											nxtlev[stepsym] = true;
+											statementdo(nxtlev, ptx, lev);		//处理赋值语句
+											cx1 = cx;			//保存jmp 0 0 的地址，后面用来回填
+											gendo(jmp, 0, 0);	//回填的地址是条件判断语句的开始
+											
+											//getsymdo;    //termdo
+											if (sym == stepsym)
+											{
+												getsymdo;
+												memcpy(nxtlev, fsys, sizeof(bool)*symnum);
+
+												cx2 = cx;		//保存 i=i+N的首地址，用于后面回填
+												expressiondo(nxtlev, ptx, lev);				//计算表达式值并生成加法指令 i:=i+N
+												gendo(lod, lev - table[i].level, table[i].adr);
+												gendo(opr, 0, 2);
+												gendo(sto, lev - table[i].level, table[i].adr);
+												code[cx1].a = cx;		//回填上面的jmp 0 0 地址，接下来该运行的是条件判断了
+
+												//getsymdo;
+												if (sym == untilsym)
+												{
+													getsymdo;
+													memcpy(nxtlev, fsys, sizeof(bool)*symnum);
+													nxtlev[dosym] = true;
+													//这里不能用conditiondo，而应该自己生成比较的汇编语句，应为
+													//for的格式不是显式地表现出比较关系的。
+													//conditiondo(nxtlev, ptx, lev);   
+
+													gendo(lod, lev - table[i].level, table[i].adr);
+													expressiondo(nxtlev, ptx, lev);
+													gendo(opr, 0, 13);
+													if (sym == dosym)
+													{
+														getsymdo;
+													}
+													else
+													{
+														error(18);
+													}
+													cx1 = cx;		//等回填，这个地址是整个for的结束地址
+													gendo(jpc, 0, 0);		
+													statementdo(fsys, ptx, lev);
+													gendo(jmp, 0, cx2);
+													code[cx1].a = cx;
+												}
+											}
+										}
+									}
+									else
+									{
+										error(34);
+									}
+								}
+								else
+								{
+									memset(nxtlev, 0, sizeof(bool)*symnum);/*语句结束无补救集合*/
+									testdo(fsys, nxtlev, 19);/*检测语句结束的正确性*/
+								}
+								
 							}
 						}
 					}

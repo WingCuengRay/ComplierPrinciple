@@ -149,6 +149,7 @@
     <None Include="E01.PL0" />
     <None Include="E02.PL0" />
     <None Include="fas.tmp" />
+    <None Include="for.pl0" />
     <None Include="if.pl0" />
     <None Include="test.pl0" />
   </ItemGroup>
