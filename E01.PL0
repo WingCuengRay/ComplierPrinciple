@@ -8,10 +8,14 @@ begin
 	write(a);
 	a -= 5;
 	write(a);
+end;
+else
+begin
+	read(a);
 	a *= 5;
 	write(a);
 	a /= 5;
 	write(a);
-end
+end;
 end.
 

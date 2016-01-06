@@ -169,11 +169,11 @@ void init()
 	statbegsys[whilesym]=true;
 	statbegsys[readsym] = true;			//新加的开始符号集 read 和 write
 	statbegsys[writesym] = true;
+	statbegsys[ident] = true;
 	/*设置因子开始符号集*/
 	facbegsys[ident]=true;
 	facbegsys[number]=true;
 	facbegsys[lparen]=true;
-
 }
  /*
   *用数组实现集合的集合运算
@@ -521,7 +521,7 @@ int block(int lev,int tx,bool* fsys)
                                       集合，开辟新的空间传递给下级函数*/
     dx=3;
     tx0=tx;                         /*记录本层名字的初始位置*/
-    table[tx].adr=cx;
+    table[tx].adr=cx;				//table为符号表
     gendo(jmp,0,0);
     if(lev > levmax)
     {
@@ -611,8 +611,13 @@ int block(int lev,int tx,bool* fsys)
         memcpy(nxtlev,statbegsys,sizeof(bool)*symnum);
         nxtlev[ident]=true;
         nxtlev[period]=true;
-        testdo(nxtlev,declbegsys,7);
-    }while(inset(sym,declbegsys));                /*直到没有声明符号*/
+        testdo(nxtlev,declbegsys,7);			//在执行 testdo()  时，const, var, begin 都不在nxtlev中
+												//所以这里有BUG,如果定义时不是按 const,var, procedure的顺序定义的话，程序便会报错 error(7)
+	/*直到没有声明符号*/
+    }while(inset(sym,declbegsys));                
+												
+												
+
     code[table[tx0].adr].a=cx;                    /*开始生成当前过程代码*/
     table[tx0].adr=cx;                            /*当前过程代码地址*/
     table[tx0].size=dx;                           /*声明部分中每增加一条声明都会给dx增加1,声明部分已经结束,dx就是当前过程数据的size*/
@@ -992,7 +997,7 @@ int statement(bool* fsys,int * ptx,int lev)
 							statementdo(nxtlev,ptx,lev);
 							while(inset(sym,statbegsys)||sym==semicolon)
 							{
-								if(sym==semicolon)
+								if (sym == semicolon)
 								{
 									getsymdo;
 								}

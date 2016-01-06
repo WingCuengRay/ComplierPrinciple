@@ -1,4 +1,6 @@
+
 var i,sum;
+const j=10;
 begin
 sum:=100;
 read(i);
@@ -7,5 +9,5 @@ while i<>0 do
 		sum-=i;
 		i:=i-1;
 	end;
-write(sum);
+write(j);
 end.		
