@@ -56,6 +56,7 @@ int main()
 				fclose(fas);
 				fclose(fin);
 				printf("\n");
+				system("PAUSE");
 				return 0;
 			}
 			fclose(fa);
@@ -111,39 +112,43 @@ void init()
 	/*设置保留字名字,按照字母顺序,便于折半查找*/
 	strcpy(&(word[0][0]),"begin");
 	strcpy(&(word[1][0]),"call");
-	strcpy(&(word[2][0]),"const");
-	strcpy(&(word[3][0]),"do");
-	strcpy(&(word[4][0]),"else");
-	strcpy(&(word[5][0]),"end");
-	strcpy(&(word[6][0]),"for");
-	strcpy(&(word[7][0]),"if");
-	strcpy(&(word[8][0]),"odd");
-	strcpy(&(word[9][0]),"procedure");
-	strcpy(&(word[10][0]),"read");
-	strcpy(&(word[11][0]),"step");
-	strcpy(&(word[12][0]),"then");
-	strcpy(&(word[13][0]),"until");
-	strcpy(&(word[14][0]),"var");
-	strcpy(&(word[15][0]),"while");
-	strcpy(&(word[16][0]),"write");
+	strcpy(&(word[2][0]), "char");
+	strcpy(&(word[3][0]),"const");
+	strcpy(&(word[4][0]),"do");
+	strcpy(&(word[5][0]),"else");
+	strcpy(&(word[6][0]),"end");
+	strcpy(&(word[7][0]),"for");
+	strcpy(&(word[8][0]),"if");
+	strcpy(&(word[9][0]),"odd");
+	strcpy(&(word[10][0]),"procedure");
+	strcpy(&(word[11][0]),"read");
+	strcpy(&(word[12][0]), "real");
+	strcpy(&(word[13][0]),"step");
+	strcpy(&(word[14][0]),"then");
+	strcpy(&(word[15][0]),"until");
+	strcpy(&(word[16][0]),"var");
+	strcpy(&(word[17][0]),"while");
+	strcpy(&(word[18][0]),"write");
 	/*设置保留字符号*/
 	wsym[0]=beginsym;
 	wsym[1]=callsym;
-	wsym[2]=constsym;
-	wsym[3]=dosym;
-	wsym[4]=elsesym;
-	wsym[5]=endsym;
-	wsym[6]=forsym;
-	wsym[7]=ifsym;
-	wsym[8]=oddsym;
-	wsym[9]=procsym;
-	wsym[10]=readsym;
-	wsym[11]=stepsym;
-	wsym[12]=thensym;
-	wsym[13]=untilsym;
-	wsym[14]=varsym;
-	wsym[15]=whilesym;
-	wsym[16]=writesym;
+	wsym[2]=charsym;
+	wsym[3]=constsym;
+	wsym[4]=dosym;
+	wsym[5]=elsesym;
+	wsym[6]=endsym;
+	wsym[7]=forsym;
+	wsym[8]=ifsym;
+	wsym[9]=oddsym;
+	wsym[10]=procsym;
+	wsym[11]=readsym;
+	wsym[12]=realsym;
+	wsym[13]=stepsym;
+	wsym[14]=thensym;
+	wsym[15]=untilsym;
+	wsym[16]=varsym;
+	wsym[17]=whilesym;
+	wsym[18]=writesym;
 	
 
 	/*设置指令名称*/
@@ -167,6 +172,8 @@ void init()
 	/*设置声明开始符号集*/
 	declbegsys[constsym]=true;
 	declbegsys[varsym]=true;
+	declbegsys[charsym] = true;
+	declbegsys[realsym] = true;
 	declbegsys[procsym]=true;
 	/*设置语句开始符号集*/
 	statbegsys[beginsym]=true;
@@ -400,6 +407,30 @@ int getsym()
 					sym = slashAssign;
 					getchdo;
 				}
+				else if (ch == '*')
+				{
+					int flag = 1;		//标志位，用于判断注释是否结束
+
+					//完全按滤过'/*'和'*/’之间的字符
+					while (getch() != -1)
+					{
+						while (ch == '*')
+						{
+							if (getch() != -1 && ch == '/')
+							{
+								if(getch() == -1)
+									goto out;
+								getsymdo;		//滤完后要重新获取一个新的sym
+								flag = 0;
+							}			
+						}
+						if (!flag)
+							break;
+					}
+out:
+					if (flag)
+						error(35);		//没有注释结束标志
+				}
 				else
 					sym = slash;
 			}
@@ -577,6 +608,46 @@ int block(int lev,int tx,bool* fsys)
 				}
 			}while(sym==ident);
 		}
+		if (sym == charsym)
+		{
+			getsymdo;
+			do {
+				chardeclarationdo(&tx, lev, &dx);
+				while (sym == comma)
+				{
+					getsymdo;
+					chardeclarationdo(&tx, lev, &dx);
+				}
+				if (sym == semicolon)
+				{
+					getsymdo;
+				}
+				else
+				{
+					error(5);
+				}
+			} while (sym == ident);
+		}
+		if (sym == realsym)
+		{
+			getsymdo;
+			do {
+				realdeclarationdo(&tx, lev, &dx);
+				while (sym == comma)
+				{
+					getsymdo;
+					realdeclarationdo(&tx, lev, &dx);
+				}
+				if (sym == semicolon)
+				{
+					getsymdo;
+				}
+				else
+				{
+					error(5);
+				}
+			} while (sym == ident);
+		}
 		while(sym==procsym)/*收到过程声名符号，开始处理过程声名*/
 		{
 			getsymdo;
@@ -699,6 +770,8 @@ void enter (enum object k,int *ptx,int lev, int *pdx)
 			}
 			table[(*ptx)].val=num;
 			break;
+		case varchar:
+		case varreal:
 		case variable:                     /*变量名字*/
 			table[(*ptx)].level=lev;
 			table[(*ptx)].adr=(*pdx);
@@ -779,6 +852,36 @@ int vardeclaration(int * ptx,int lev,int * pdx)
  		error(4);
     }
     return 0;
+}
+
+int chardeclaration(int *ptx, int lev, int *pdx)
+{
+	if (sym == ident)
+	{
+		enter(varchar, ptx, lev, pdx);
+		getsymdo;
+	}
+	else
+	{
+		error(4);
+	}
+
+	return 0;
+}
+
+int realdeclaration(int *ptx, int lev, int *pdx)
+{
+	if (sym == ident)
+	{
+		enter(varreal, ptx, lev, pdx);
+		getsymdo;
+	}
+	else
+	{
+		error(4);
+	}
+
+	return 0;
 }
 
  /*

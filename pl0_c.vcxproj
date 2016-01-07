@@ -152,6 +152,7 @@
     <None Include="for.pl0" />
     <None Include="if.pl0" />
     <None Include="test.pl0" />
+    <None Include="type.pl0" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PL0.cpp" />

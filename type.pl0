@@ -1,0 +1,20 @@
+var i,j,n;
+char ab;/**
+** this is a comment
+**/
+
+real ac;
+begin
+	n := 10;
+	j := 0;	   
+	/*ÊµÏÖfor*/
+	for i:=1 step 1 until n do
+	/**
+	** this is a comment
+	**/
+	begin
+		if j>0 then
+			write(j);
+		j += 1;
+	end;
+end.

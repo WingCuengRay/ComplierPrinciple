@@ -1,6 +1,6 @@
  /*PL/0 编译系统C版本头文件 pl0.h*/
 
-# define norw 17                 /*关键字个数*/
+# define norw 19                 /*关键字个数*/
 # define txmax 100               /*名字表容量*/
 # define nmax  14                /*number的最大位数*/
 # define al 10                   /*符号的最大长度*/
@@ -17,13 +17,15 @@ enum symbol {
 	writesym, readsym, dosym, callsym, constsym,
 	varsym, procsym, elsesym, forsym, stepsym,
 	untilsym, returnsym, plusAssign, minusAssign,
-	timesAssign, slashAssign,plusplus
+	timesAssign, slashAssign,plusplus,charsym,realsym
 };
-#define symnum 42			//!!修改symbol枚举结构时要对应修改symnum
+#define symnum 44			//!!修改symbol枚举结构时要对应修改symnum
 /*-------------*/
 enum object{
    constant,
    variable,
+   varchar,
+   varreal,
    procedur,
 };
 /*--------------*/
@@ -93,6 +95,8 @@ int err;                                       /*错误计数器*/
 #define statementdo(a,b,c)                    if(-1==statement(a,b,c))return -1
 #define constdeclarationdo(a,b,c)             if(-1==constdeclaration(a,b,c))return -1
 #define vardeclarationdo(a,b,c)               if(-1==vardeclaration(a,b,c))return -1
+#define chardeclarationdo(a,b,c)			  if(-1==chardeclaration(a,b,c))return -1
+#define realdeclarationdo(a,b,c)			  if(-1==realdeclaration(a,b,c))return -1
 void error(int n);
 int getsym();
 int getch();
@@ -116,6 +120,9 @@ int constdeclaration(int* ptx,int lev, int* pdx);
 int position(char* idt,int tx);
 void enter(enum object k,int* ptx,int lev,int* pdx);
 int base(int l,int* s,int b);
+
+int chardeclaration(int *ptx, int lev, int *pdx);
+int realdeclaration(int *ptx, int lev, int *pdx);
 
         
 

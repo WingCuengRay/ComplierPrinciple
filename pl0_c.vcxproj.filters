@@ -33,6 +33,7 @@
     <None Include="for.pl0">
       <Filter>源文件</Filter>
     </None>
+    <None Include="type.pl0" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PL0.cpp">
